@@ -27,10 +27,16 @@ export default function App() {
   if (err)
     return (
       <div className="p-10 text-red-700">
-        Could not open the local database: {err}. Check that browser storage is enabled (not private mode).
+        Could not connect to Supabase: {err}. Please check your internet connection.
       </div>
     );
-  if (!ready) return <div className="p-10 text-slate2">Preparing local database…</div>;
+  if (!ready)
+    return (
+      <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center p-4 text-white">
+        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3" />
+        <span className="text-sm font-semibold text-slate-300">Connecting to MapNexa Cloud…</span>
+      </div>
+    );
 
   return (
     <Routes>

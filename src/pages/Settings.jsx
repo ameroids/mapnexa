@@ -574,30 +574,30 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Database Vault & Diagnostics */}
+        {/* Cloud Database & Sync Diagnostics */}
         <div className="card p-6 space-y-4 bg-white">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <span className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
               <Database size={18} />
             </span>
             <h3 className="font-extrabold text-base text-slate-900 font-display">
-              Browser Vault & Diagnostics
+              Cloud Database & Device Sync
             </h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-600">
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
               <div>
-                <p className="font-bold text-slate-800">Storage Architecture</p>
-                <p className="text-[11px] text-slate-500">IndexedDB via Dexie.js (Zero latency)</p>
+                <p className="font-bold text-slate-800">Cloud Backend</p>
+                <p className="text-[11px] text-slate-500">Supabase Cloud Database (PostgreSQL)</p>
               </div>
-              <span className="badge badge-indigo">Active</span>
+              <span className="badge badge-indigo">Connected</span>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
               <div>
-                <p className="font-bold text-slate-800">Security & Isolation</p>
-                <p className="text-[11px] text-slate-500">All data stored 100% locally on this device</p>
+                <p className="font-bold text-slate-800">Multi-Device Synchronization</p>
+                <p className="text-[11px] text-slate-500">Real-time sync across phones, tablets & desktops</p>
               </div>
               <ShieldCheck size={18} className="text-emerald-500" />
             </div>
@@ -608,7 +608,7 @@ export default function Settings() {
                 onClick={run(restoreDemo, 'Demo factories and visits restored successfully')}
               >
                 <RotateCcw size={14} />
-                <span>Reload Default Demo Dataset</span>
+                <span>Reload Default Demo Dataset to Cloud</span>
               </button>
             </div>
           </div>

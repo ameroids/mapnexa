@@ -36,7 +36,7 @@ export const Logo = ({ name }) => (
     </div>
     <div className="flex flex-col">
       <span className="font-extrabold text-base tracking-tight text-white flex items-center gap-1.5 font-display">
-        {name}
+        MapNexa
         <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
           PRO
         </span>
@@ -124,14 +124,14 @@ export default function Layout() {
           ))}
         </nav>
 
-        {/* Quick Offline Status Card */}
-        <div className="p-4 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/80 border border-slate-700/50 backdrop-blur-md relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-semibold text-slate-200">Local Browser Vault</span>
+        {/* Cloud Sync Status Card */}
+        <div className="p-3.5 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/80 border border-slate-700/50 backdrop-blur-md relative overflow-hidden">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold text-slate-200">Supabase Cloud Sync</span>
           </div>
           <p className="text-[11px] text-slate-400 leading-relaxed">
-            Fast, zero-latency database powered by IndexedDB. 100% private.
+            Connected & live across all your team's phones and computers.
           </p>
         </div>
       </aside>
@@ -232,54 +232,21 @@ export default function Layout() {
                     onClick={() => setUserMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-2 z-50 animate-scale-in text-slate-800">
-                    <div className="px-3 py-2 border-b border-slate-100">
+                    <div className="p-3 border-b border-slate-100">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Current Account
+                        Signed In Account
                       </p>
-                      <p className="text-xs font-bold text-slate-800 mt-0.5">{currentUser?.name}</p>
-                      <p className="text-[11px] font-mono text-slate-400 mt-0.5">
-                        Username: <b className="text-slate-700">{currentUser?.username || 'admin'}</b>
+                      <p className="text-sm font-bold text-slate-800 mt-0.5">{currentUser?.name}</p>
+                      <p className="text-xs font-mono text-slate-500 mt-0.5">
+                        @{currentUser?.username || 'user'}
                       </p>
-                      <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      <span className={`inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                         isAdmin
                           ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}>
-                        {isAdmin ? 'Full System Access' : 'Custom Permissions'}
+                        {isAdmin ? 'System Administrator' : 'Field Personnel'}
                       </span>
-                    </div>
-
-                    <div className="py-1">
-                      <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Switch / Login Account
-                      </p>
-                      {users.map((u) => {
-                        const active = u.id === currentUser?.id;
-                        return (
-                          <button
-                            key={u.id}
-                            type="button"
-                            className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors ${
-                              active ? 'font-bold text-indigo-600 bg-indigo-50/50' : 'text-slate-700'
-                            }`}
-                            onClick={() => {
-                              switchUser(u);
-                              setUserMenuOpen(false);
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">
-                                {u.avatarText || u.name[0]}
-                              </span>
-                              <div>
-                                <span className="block leading-none">{u.name}</span>
-                                <span className="text-[10px] text-slate-400">@{u.username || 'user'} • {u.role}</span>
-                              </div>
-                            </div>
-                            {active && <Check size={14} className="text-indigo-600" />}
-                          </button>
-                        );
-                      })}
                     </div>
 
                     <div className="p-2 border-t border-slate-100 space-y-1">
@@ -296,7 +263,7 @@ export default function Layout() {
 
                       <button
                         type="button"
-                        className="w-full btn btn-d !py-1.5 !text-xs !justify-start"
+                        className="w-full btn btn-d !py-2 !text-xs !justify-start font-semibold"
                         onClick={() => {
                           setUserMenuOpen(false);
                           logout();
