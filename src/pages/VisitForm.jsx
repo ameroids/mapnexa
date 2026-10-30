@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ExternalLink, Save, ChevronDown, CheckCircle2, AlertCircle, Link2, MapPin, Building, Calendar, Layers, CheckSquare } from 'lucide-react';
+import { ExternalLink, Save, ChevronDown, CheckCircle2, AlertCircle, Link2, MapPin, Building, Calendar, Layers, CheckSquare, Compass } from 'lucide-react';
 import { useData, useSettings } from '../database/useData.js';
 import { saveCompany, saveVisit } from '../database/repositories.js';
 import { Head, Field, Modal, Confirm, Loading, useToast } from '../components/ui.jsx';
@@ -114,7 +114,8 @@ export default function VisitForm({ mode }) {
   const { rows, visits, byId, loading } = useData();
   const s = useSettings();
 
-  const [f, setF] = useState(() => blank('First Visit'));
+  const [locMode, setLocMode] = useState('link'); // 'link' or 'coords'
+  const [combinedCoords, setCombinedCoords] = useState('');
   const [err, setErr] = useState({});
   const [dirty, setDirty] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -145,6 +146,9 @@ export default function VisitForm({ mode }) {
         discussedText: (visit.productsDiscussed || []).join(', '),
       });
     setF(base);
+    if (base.latitude !== '' && base.longitude !== '') {
+      setCombinedCoords(`${base.latitude}, ${base.longitude}`);
+    }
     setLoaded(true);
   }, [loading, loaded, company, visit, mode, s.defaultVisitType]);
 
@@ -181,6 +185,7 @@ export default function VisitForm({ mode }) {
     if (p?.lat != null) {
       n.latitude = p.lat;
       n.longitude = p.lng;
+      setCombinedCoords(`${p.lat}, ${p.lng}`);
       const near = nearestCity(p.lat, p.lng);
       if (near && !f.city) {
         n.city = near.city;
@@ -190,6 +195,55 @@ export default function VisitForm({ mode }) {
     } else if (url.trim() === '') {
       n.latitude = '';
       n.longitude = '';
+      setCombinedCoords('');
+    }
+    setF(n);
+  };
+
+  const onCombinedCoordsChange = (e) => {
+    const text = e.target.value;
+    setCombinedCoords(text);
+    setDirty(true);
+
+    // Try parsing latitude, longitude from text like "22.7196, 75.8577" or "22.7196 75.8577"
+    const m = text.trim().match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+    if (m) {
+      const lat = m[1];
+      const lng = m[2];
+      const n = {
+        ...f,
+        latitude: lat,
+        longitude: lng,
+        googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
+      };
+      const near = nearestCity(+lat, +lng);
+      if (near && !f.city) {
+        n.city = near.city;
+        n.state = near.state;
+      }
+      setF(n);
+    } else if (text.trim() === '') {
+      setF({ ...f, latitude: '', longitude: '', googleMapsUrl: '' });
+    }
+  };
+
+  const onSeparateCoordChange = (key) => (e) => {
+    const val = e.target.value;
+    const otherKey = key === 'latitude' ? 'longitude' : 'latitude';
+    const otherVal = f[otherKey];
+    const n = { ...f, [key]: val };
+    setDirty(true);
+
+    if (val.trim() && otherVal.trim()) {
+      const lat = key === 'latitude' ? val.trim() : otherVal.trim();
+      const lng = key === 'longitude' ? val.trim() : otherVal.trim();
+      setCombinedCoords(`${lat}, ${lng}`);
+      n.googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      const near = nearestCity(+lat, +lng);
+      if (near && !f.city) {
+        n.city = near.city;
+        n.state = near.state;
+      }
     }
     setF(n);
   };
@@ -322,68 +376,122 @@ export default function VisitForm({ mode }) {
       {showCo && (
         <Sec n="1" title="Company & Factory Location" icon={MapPin}>
           <div className="space-y-4">
-            <Field label="Google Maps Location Link" error={err.googleMapsUrl}>
-              <div className="relative">
-                <Link2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="input !pl-10 !bg-slate-50 focus:!bg-white"
-                  value={f.googleMapsUrl}
-                  onChange={onLink}
-                  placeholder="Paste link from Google Maps (Share → Copy link)"
-                />
-              </div>
-            </Field>
+            {/* Input Selection Tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+              <button
+                type="button"
+                onClick={() => setLocMode('link')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  locMode === 'link'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80'
+                }`}
+              >
+                <Link2 size={14} />
+                <span>Google Maps Link</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocMode('coords')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  locMode === 'coords'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80'
+                }`}
+              >
+                <Compass size={14} />
+                <span>GPS Coordinates (Lat & Long)</span>
+              </button>
+            </div>
 
-            {linkOk && hasPin && (
-              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-                <span>
-                  GPS Pin detected: ({+(+f.latitude).toFixed(4)}, {+(+f.longitude).toFixed(4)}). Will be displayed on interactive map.
-                </span>
+            {locMode === 'link' && (
+              <Field label="Google Maps Location Link" error={err.googleMapsUrl}>
+                <div className="relative">
+                  <Link2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="input !pl-10 !bg-slate-50 focus:!bg-white"
+                    value={f.googleMapsUrl}
+                    onChange={onLink}
+                    placeholder="Paste link from Google Maps (Share → Copy link or browser address bar)"
+                  />
+                </div>
+              </Field>
+            )}
+
+            {locMode === 'coords' && (
+              <div className="space-y-3 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+                <Field label="Enter Coordinates Together (Lat, Lng)" error={err.latitude || err.longitude}>
+                  <div className="relative">
+                    <Compass size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500" />
+                    <input
+                      className="input !pl-10 !bg-white"
+                      value={combinedCoords}
+                      onChange={onCombinedCoordsChange}
+                      placeholder="e.g. 22.7196, 75.8577"
+                    />
+                  </div>
+                  <span className="text-[11px] text-slate-500 mt-1 block">
+                    Paste both coordinates together separated by comma or space.
+                  </span>
+                </Field>
+
+                <div className="flex items-center gap-3 my-1">
+                  <div className="h-px bg-slate-200 flex-1" />
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">or enter separately</span>
+                  <div className="h-px bg-slate-200 flex-1" />
+                </div>
+
+                <G>
+                  <Field label="Latitude" error={err.latitude}>
+                    <input
+                      className="input bg-white"
+                      value={f.latitude}
+                      onChange={onSeparateCoordChange('latitude')}
+                      placeholder="e.g. 22.7196"
+                    />
+                  </Field>
+                  <Field label="Longitude" error={err.longitude}>
+                    <input
+                      className="input bg-white"
+                      value={f.longitude}
+                      onChange={onSeparateCoordChange('longitude')}
+                      placeholder="e.g. 75.8577"
+                    />
+                  </Field>
+                </G>
               </div>
             )}
 
-            {linkOk && !hasPin && (
+            {hasPin && (
+              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>
+                    GPS Pin: ({+(+f.latitude).toFixed(4)}, {+(+f.longitude).toFixed(4)}) ready for navigation & map.
+                  </span>
+                </div>
+                {viewUrl(f) && (
+                  <button
+                    type="button"
+                    className="btn !text-[11px] !py-1 !px-2 bg-white hover:bg-slate-50 text-indigo-600 shrink-0"
+                    onClick={() => window.open(viewUrl(f), '_blank', 'noopener,noreferrer')}
+                  >
+                    <ExternalLink size={12} />
+                    <span>Test in Maps</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {locMode === 'link' && linkOk && !hasPin && (
               <div className="text-xs bg-amber-50 text-amber-800 rounded-xl p-3.5 flex gap-2.5 border border-amber-200/80">
                 <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-600" />
                 <p className="leading-relaxed">
                   {isShortLink(f.googleMapsUrl)
-                    ? 'Short link detected: Open it in your browser and paste the full address bar URL, or manually enter the latitude and longitude below.'
-                    : 'No coordinates embedded in this link. Enter latitude/longitude below or use the full browser URL.'}
+                    ? 'Short link detected: Open it in your browser and paste the full address bar URL, or switch to the "GPS Coordinates" tab above to enter latitude and longitude.'
+                    : 'No coordinates found in this link. Switch to the "GPS Coordinates" tab above to type latitude and longitude directly.'}
                 </p>
               </div>
-            )}
-
-            {linkOk && !hasPin && (
-              <G>
-                <Field label="Latitude (Optional)" error={err.latitude}>
-                  <input
-                    className="input bg-slate-50 focus:bg-white"
-                    value={f.latitude}
-                    onChange={ch('latitude')}
-                    placeholder="e.g. 22.7196"
-                  />
-                </Field>
-                <Field label="Longitude (Optional)" error={err.longitude}>
-                  <input
-                    className="input bg-slate-50 focus:bg-white"
-                    value={f.longitude}
-                    onChange={ch('longitude')}
-                    placeholder="e.g. 75.8577"
-                  />
-                </Field>
-              </G>
-            )}
-
-            {viewUrl(f) && (
-              <button
-                type="button"
-                className="btn !text-xs !py-1.5"
-                onClick={() => window.open(viewUrl(f), '_blank', 'noopener,noreferrer')}
-              >
-                <ExternalLink size={13} className="text-indigo-600" />
-                <span>Verify Pin on Google Maps</span>
-              </button>
             )}
 
             <G>
