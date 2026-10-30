@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Download, Upload, RotateCcw, Trash2, AlertTriangle, ShieldCheck, Database, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock } from 'lucide-react';
+import { Download, Upload, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock } from 'lucide-react';
 import { useSettings } from '../database/useData.js';
 import { useAuth, ALL_PERMISSIONS } from '../context/AuthContext.jsx';
-import { saveSettings, clearDemoData, clearAll } from '../database/repositories.js';
+import { saveSettings } from '../database/repositories.js';
 import { exportAll, validate, importAll } from '../utils/backup.js';
 import { Head, Field, Confirm, useToast } from '../components/ui.jsx';
 
@@ -520,98 +520,56 @@ export default function Settings() {
         />
       )}
 
-      <div className="grid lg:grid-cols-2 gap-5">
-        {/* Application Preferences Card */}
-        <div className="card p-6 space-y-4 bg-white">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
-              <Sliders size={18} />
-            </span>
-            <h3 className="font-extrabold text-base text-slate-900 font-display">General Preferences</h3>
-          </div>
-
-          <Field label="Application Name">
-            <input
-              className="input bg-slate-50 focus:bg-white"
-              value={s.appName}
-              onChange={(e) => setS({ ...s, appName: e.target.value })}
-            />
-          </Field>
-
-          <Field label="Default Visit Type">
-            <select
-              className="input bg-slate-50 focus:bg-white"
-              value={s.defaultVisitType}
-              onChange={(e) => setS({ ...s, defaultVisitType: e.target.value })}
-            >
-              {['First Visit', 'Follow-up Visit', 'Repeat Visit', 'Business Meeting', 'Other'].map(
-                (t) => (
-                  <option key={t}>{t}</option>
-                )
-              )}
-            </select>
-          </Field>
-
-          <Field label="Default Travel Mode for Navigation">
-            <select
-              className="input bg-slate-50 focus:bg-white capitalize"
-              value={s.defaultTravelMode}
-              onChange={(e) => setS({ ...s, defaultTravelMode: e.target.value })}
-            >
-              {['driving', 'walking', 'bicycling', 'transit'].map((t) => (
-                <option key={t}>{t}</option>
-              ))}
-            </select>
-          </Field>
-
-          <div className="pt-2">
-            <button
-              className="btn btn-p shadow-glow-brand"
-              onClick={run(() => saveSettings(s), 'Preferences successfully saved')}
-            >
-              Save System Preferences
-            </button>
-          </div>
+      {/* General Preferences Card */}
+      <div className="card p-6 space-y-4 bg-white">
+        <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+          <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+            <Sliders size={18} />
+          </span>
+          <h3 className="font-extrabold text-base text-slate-900 font-display">General Preferences</h3>
         </div>
 
-        {/* Database & Sync Status */}
-        <div className="card p-6 space-y-4 bg-white">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <span className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
-              <Database size={18} />
-            </span>
-            <h3 className="font-extrabold text-base text-slate-900 font-display">
-              Cloud Database & Device Sync
-            </h3>
-          </div>
+        <Field label="Application Name">
+          <input
+            className="input bg-slate-50 focus:bg-white"
+            value={s.appName}
+            onChange={(e) => setS({ ...s, appName: e.target.value })}
+          />
+        </Field>
 
-          <div className="space-y-3 text-xs text-slate-600">
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-              <div>
-                <p className="font-bold text-slate-800">Cloud Backend</p>
-                <p className="text-[11px] text-slate-500">Cloud Realtime Database (PostgreSQL)</p>
-              </div>
-              <span className="badge badge-indigo">Connected</span>
-            </div>
+        <Field label="Default Visit Type">
+          <select
+            className="input bg-slate-50 focus:bg-white"
+            value={s.defaultVisitType}
+            onChange={(e) => setS({ ...s, defaultVisitType: e.target.value })}
+          >
+            {['First Visit', 'Follow-up Visit', 'Repeat Visit', 'Business Meeting', 'Other'].map(
+              (t) => (
+                <option key={t}>{t}</option>
+              )
+            )}
+          </select>
+        </Field>
 
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-              <div>
-                <p className="font-bold text-slate-800">Multi-Device Synchronization</p>
-                <p className="text-[11px] text-slate-500">Real-time sync across phones, tablets & desktops</p>
-              </div>
-              <ShieldCheck size={18} className="text-emerald-500" />
-            </div>
+        <Field label="Default Travel Mode for Navigation">
+          <select
+            className="input bg-slate-50 focus:bg-white capitalize"
+            value={s.defaultTravelMode}
+            onChange={(e) => setS({ ...s, defaultTravelMode: e.target.value })}
+          >
+            {['driving', 'walking', 'bicycling', 'transit'].map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </Field>
 
-            <div className="pt-2">
-              <button
-                className="btn btn-s w-full text-rose-600 border-rose-200 hover:bg-rose-50"
-                onClick={() => setAsk('clearDemo')}
-              >
-                <Trash2 size={14} />
-                <span>Remove All Demo Data</span>
-              </button>
-            </div>
-          </div>
+        <div className="pt-2">
+          <button
+            className="btn btn-p shadow-glow-brand"
+            onClick={run(() => saveSettings(s), 'Preferences successfully saved')}
+          >
+            Save System Preferences
+          </button>
         </div>
       </div>
 
@@ -725,44 +683,6 @@ export default function Settings() {
           </div>
         )}
       </div>
-
-      {/* Danger Zone */}
-      <div className="card p-6 border-rose-200 bg-rose-50/20 space-y-3">
-        <div className="flex items-center gap-2 pb-2">
-          <AlertTriangle size={18} className="text-rose-600" />
-          <h3 className="font-extrabold text-base text-rose-900 font-display">Danger Zone</h3>
-        </div>
-        <p className="text-xs text-rose-700 leading-relaxed">
-          Resetting the database permanently purges all companies, visit notes, coordinates, and custom
-          configurations from your browser and cloud database.
-        </p>
-        <div>
-          <button className="btn btn-d" onClick={() => setAsk('clear')}>
-            <Trash2 size={14} />
-            <span>Purge All Application Data</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Clear Confirmation Dialogue */}
-      {ask === 'clear' && (
-        <Confirm
-          title="Permanently Purge All Data?"
-          text="This action is irreversible. All database records will be erased completely."
-          onNo={() => setAsk('')}
-          onYes={run(clearAll, 'Database erased successfully')}
-        />
-      )}
-
-      {/* Clear Demo Data Confirmation Dialogue */}
-      {ask === 'clearDemo' && (
-        <Confirm
-          title="Remove All Demo Data?"
-          text="This will remove all sample/demo factories and visits, leaving your real work data untouched."
-          onNo={() => setAsk('')}
-          onYes={run(clearDemoData, 'Demo data removed successfully')}
-        />
-      )}
     </div>
   );
 }
