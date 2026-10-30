@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
+import SplashScreen from './components/SplashScreen.jsx';
 import { seedIfNeeded } from './database/repositories.js';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -15,6 +16,7 @@ import { useAuth } from './context/AuthContext.jsx';
 
 export default function App() {
   const [ready, setReady] = useState(false);
+  const [splashDone, setSplashDone] = useState(false);
   const [err, setErr] = useState('');
   const { isAuthenticated, isAdmin, hasPermission } = useAuth();
 
@@ -30,16 +32,14 @@ export default function App() {
         Could not connect to Supabase: {err}. Please check your internet connection.
       </div>
     );
-  if (!ready)
-    return (
-      <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center p-4 text-white">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3" />
-        <span className="text-sm font-semibold text-slate-300">Connecting to MapNexa Cloud…</span>
-      </div>
-    );
 
   return (
-    <Routes>
+    <>
+      {(!ready || !splashDone) && (
+        <SplashScreen onFinish={() => setSplashDone(true)} />
+      )}
+      {ready && splashDone && (
+        <Routes>
       {/* Public Login Route */}
       <Route
         path="/login"
@@ -90,5 +90,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       )}
     </Routes>
+      )}
+    </>
   );
 }
