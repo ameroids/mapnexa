@@ -114,6 +114,7 @@ export default function VisitForm({ mode }) {
   const { rows, visits, byId, loading } = useData();
   const s = useSettings();
 
+  const [f, setF] = useState(() => blank('First Visit'));
   const [locMode, setLocMode] = useState('link'); // 'link' or 'coords'
   const [combinedCoords, setCombinedCoords] = useState('');
   const [err, setErr] = useState({});

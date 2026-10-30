@@ -165,12 +165,36 @@ export async function syncFromSupabase() {
       supabase.from('settings').select('*'),
     ]);
 
-    if (!cRes.error && cRes.data?.length > 0) {
-      await db.companies.bulkPut(cRes.data);
+    // If Supabase returned data successfully, make IndexedDB match Supabase exactly
+    if (!cRes.error && Array.isArray(cRes.data)) {
+      const serverCompanies = cRes.data;
+      const localCompanies = await db.companies.toArray();
+      const serverIds = new Set(serverCompanies.map((c) => c.id));
+      
+      // Remove any local record that no longer exists on Supabase (e.g. old demo data)
+      const toDelete = localCompanies.filter((c) => !serverIds.has(c.id)).map((c) => c.id);
+      if (toDelete.length > 0) {
+        await db.companies.bulkDelete(toDelete);
+      }
+      if (serverCompanies.length > 0) {
+        await db.companies.bulkPut(serverCompanies);
+      }
     }
-    if (!vRes.error && vRes.data?.length > 0) {
-      await db.visits.bulkPut(vRes.data);
+
+    if (!vRes.error && Array.isArray(vRes.data)) {
+      const serverVisits = vRes.data;
+      const localVisits = await db.visits.toArray();
+      const serverIds = new Set(serverVisits.map((v) => v.id));
+
+      const toDeleteVisits = localVisits.filter((v) => !serverIds.has(v.id)).map((v) => v.id);
+      if (toDeleteVisits.length > 0) {
+        await db.visits.bulkDelete(toDeleteVisits);
+      }
+      if (serverVisits.length > 0) {
+        await db.visits.bulkPut(serverVisits);
+      }
     }
+
     if (!sRes.error && sRes.data?.length > 0) {
       for (const s of sRes.data) {
         await db.settings.put(s);
