@@ -78,24 +78,28 @@ export function Modal({ title, onClose, children, footer }) {
   );
 }
 
-export const Confirm = ({ title, text, onYes, onNo, yes = 'Delete' }) => (
-  <Modal
-    title={title}
-    onClose={onNo}
-    footer={
-      <>
-        <button className="btn" onClick={onNo}>
-          Cancel
-        </button>
-        <button className="btn btn-d" onClick={onYes}>
-          {yes}
-        </button>
-      </>
-    }
-  >
-    {text}
-  </Modal>
-);
+export const Confirm = ({ title, text, onYes, onNo, onOk, onCancel, yes = 'Delete' }) => {
+  const handleYes = onYes || onOk;
+  const handleNo = onNo || onCancel;
+  return (
+    <Modal
+      title={title}
+      onClose={handleNo}
+      footer={
+        <>
+          <button className="btn" onClick={handleNo}>
+            Cancel
+          </button>
+          <button className="btn btn-d" onClick={handleYes}>
+            {yes}
+          </button>
+        </>
+      }
+    >
+      {text}
+    </Modal>
+  );
+};
 
 const badgeStyles = {
   Overdue: {

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Download, Upload, RotateCcw, Trash2, AlertTriangle, ShieldCheck, Database, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock } from 'lucide-react';
 import { useSettings } from '../database/useData.js';
 import { useAuth, ALL_PERMISSIONS } from '../context/AuthContext.jsx';
-import { saveSettings, restoreDemo, clearAll } from '../database/repositories.js';
+import { saveSettings, clearDemoData, clearAll } from '../database/repositories.js';
 import { exportAll, validate, importAll } from '../utils/backup.js';
 import { Head, Field, Confirm, useToast } from '../components/ui.jsx';
 
@@ -221,7 +221,7 @@ export default function Settings() {
               </label>
               <input
                 className="input bg-white text-xs"
-                placeholder="e.g. ramesh@factorytrack.com"
+                placeholder="e.g. ramesh@mapnexa.com"
                 value={newUserEmail}
                 onChange={(e) => setNewUserEmail(e.target.value)}
               />
@@ -506,9 +506,9 @@ export default function Settings() {
       {delUserId && (
         <Confirm
           title="Delete User Account?"
-          text="This user will no longer be able to log into FactoryTrack. Recorded visits created by them will remain intact."
-          onCancel={() => setDelUserId(null)}
-          onOk={async () => {
+          text="This user will no longer be able to log into the application. Recorded visits created by them will remain intact."
+          onNo={() => setDelUserId(null)}
+          onYes={async () => {
             try {
               await deleteUser(delUserId);
               toast('User removed');
@@ -574,7 +574,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Cloud Database & Sync Diagnostics */}
+        {/* Database & Sync Status */}
         <div className="card p-6 space-y-4 bg-white">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
             <span className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
@@ -589,7 +589,7 @@ export default function Settings() {
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
               <div>
                 <p className="font-bold text-slate-800">Cloud Backend</p>
-                <p className="text-[11px] text-slate-500">Supabase Cloud Database (PostgreSQL)</p>
+                <p className="text-[11px] text-slate-500">Cloud Realtime Database (PostgreSQL)</p>
               </div>
               <span className="badge badge-indigo">Connected</span>
             </div>
@@ -604,11 +604,11 @@ export default function Settings() {
 
             <div className="pt-2">
               <button
-                className="btn btn-s w-full"
-                onClick={run(restoreDemo, 'Demo factories and visits restored successfully')}
+                className="btn btn-s w-full text-rose-600 border-rose-200 hover:bg-rose-50"
+                onClick={() => setAsk('clearDemo')}
               >
-                <RotateCcw size={14} />
-                <span>Reload Default Demo Dataset to Cloud</span>
+                <Trash2 size={14} />
+                <span>Remove All Demo Data</span>
               </button>
             </div>
           </div>
@@ -734,12 +734,12 @@ export default function Settings() {
         </div>
         <p className="text-xs text-rose-700 leading-relaxed">
           Resetting the database permanently purges all companies, visit notes, coordinates, and custom
-          configurations from your browser vault.
+          configurations from your browser and cloud database.
         </p>
         <div>
           <button className="btn btn-d" onClick={() => setAsk('clear')}>
             <Trash2 size={14} />
-            <span>Purge All FactoryTrack Data</span>
+            <span>Purge All Application Data</span>
           </button>
         </div>
       </div>
@@ -748,9 +748,19 @@ export default function Settings() {
       {ask === 'clear' && (
         <Confirm
           title="Permanently Purge All Data?"
-          text="This action is irreversible. All local database records will be erased completely."
-          onCancel={() => setAsk('')}
-          onOk={run(clearAll, 'Database erased successfully')}
+          text="This action is irreversible. All database records will be erased completely."
+          onNo={() => setAsk('')}
+          onYes={run(clearAll, 'Database erased successfully')}
+        />
+      )}
+
+      {/* Clear Demo Data Confirmation Dialogue */}
+      {ask === 'clearDemo' && (
+        <Confirm
+          title="Remove All Demo Data?"
+          text="This will remove all sample/demo factories and visits, leaving your real work data untouched."
+          onNo={() => setAsk('')}
+          onYes={run(clearDemoData, 'Demo data removed successfully')}
         />
       )}
     </div>

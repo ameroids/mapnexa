@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Factory, Lock, User, ShieldCheck, ArrowRight, Sparkles, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Factory, Lock, User, ShieldCheck, ArrowRight, Sparkles, AlertCircle, Eye, EyeOff, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useSettings } from '../database/useData.js';
 
@@ -142,10 +142,25 @@ export default function Login() {
           </form>
         </div>
 
-        {/* Security badge */}
-        <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-          <ShieldCheck size={14} className="text-emerald-500" />
-          <span>Local Device Security & Offline Vault</span>
+        {/* Security badge & Developer Branding */}
+        <div className="flex flex-col items-center justify-center gap-2 text-xs text-slate-500 pt-1">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={14} className="text-emerald-500" />
+            <span>Local Device Security & Offline Vault</span>
+          </div>
+          <div className="pt-2 border-t border-slate-800/80 w-full text-center flex items-center justify-center gap-2 text-slate-400">
+            <span>Developed by Ameroids Tech Studio</span>
+            <span>•</span>
+            <a
+              href="https://wa.me/917223861653"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-medium"
+            >
+              <MessageCircle size={13} />
+              <span>+91 7223861653</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

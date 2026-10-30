@@ -182,39 +182,41 @@ export async function syncFromSupabase() {
 }
 
 export async function seedIfNeeded() {
-  // First try fetching latest records from Supabase
+  // Try fetching latest records from Supabase
   await syncFromSupabase();
-
-  const count = await db.companies.count();
-  if (count === 0) {
-    // If Supabase and local DB are both empty, seed demo dataset
-    const d = buildDemo();
-    await db.companies.bulkPut(d.companies);
-    await db.visits.bulkPut(d.visits);
-
-    // Also push demo dataset to Supabase so it's populated there!
-    try {
-      await supabase.from('companies').upsert(d.companies);
-      await supabase.from('visits').upsert(d.visits);
-    } catch (e) {
-      console.warn('Failed to push initial demo data to Supabase:', e);
-    }
-  }
   await db.settings.put({ key: 'seeded', value: true });
 }
 
-export async function restoreDemo() {
-  const d = buildDemo();
+export async function clearDemoData() {
+  // Delete all demo records (whose ID starts with 'demo-') from local IndexedDB
+  const allCompanies = await db.companies.toArray();
+  const demoCompanyIds = allCompanies.filter(c => String(c.id).startsWith('demo-')).map(c => c.id);
+
+  const allVisits = await db.visits.toArray();
+  const demoVisitIds = allVisits.filter(v => String(v.id).startsWith('demo-') || demoCompanyIds.includes(v.companyId)).map(v => v.id);
+
   await db.transaction('rw', db.companies, db.visits, async () => {
-    await db.companies.bulkPut(d.companies);
-    await db.visits.bulkPut(d.visits);
+    if (demoVisitIds.length > 0) {
+      await db.visits.bulkDelete(demoVisitIds);
+    }
+    if (demoCompanyIds.length > 0) {
+      await db.companies.bulkDelete(demoCompanyIds);
+    }
   });
 
+  // Also remove demo records from Supabase
   try {
-    await supabase.from('companies').upsert(d.companies);
-    await supabase.from('visits').upsert(d.visits);
+    if (demoVisitIds.length > 0) {
+      await supabase.from('visits').delete().in('id', demoVisitIds);
+    }
+    if (demoCompanyIds.length > 0) {
+      await supabase.from('companies').delete().in('id', demoCompanyIds);
+    }
+    // Safety check: also remove by prefix pattern on Supabase if any exist
+    await supabase.from('visits').delete().like('id', 'demo-%');
+    await supabase.from('companies').delete().like('id', 'demo-%');
   } catch (e) {
-    console.warn('Supabase restoreDemo error:', e);
+    console.warn('Supabase clearDemoData warning:', e);
   }
 }
 

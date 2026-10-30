@@ -20,7 +20,8 @@ import {
   Command,
   ChevronDown,
   Check,
-  LogOut
+  LogOut,
+  MessageCircle
 } from 'lucide-react';
 import { useData, useSettings } from '../database/useData.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -124,15 +125,23 @@ export default function Layout() {
           ))}
         </nav>
 
-        {/* Cloud Sync Status Card */}
-        <div className="p-3.5 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/80 border border-slate-700/50 backdrop-blur-md relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-slate-200">Supabase Cloud Sync</span>
-          </div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            Connected & live across all your team's phones and computers.
+        {/* Developer Branding & WhatsApp Contact */}
+        <div className="p-3 m-3 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/80 border border-slate-700/50 backdrop-blur-md">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            Developed by
           </p>
+          <p className="text-xs font-bold text-white mb-2">
+            Ameroids Tech Studio
+          </p>
+          <a
+            href="https://wa.me/917223861653"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-semibold transition-all w-full justify-center group"
+          >
+            <MessageCircle size={14} className="text-emerald-400 group-hover:scale-110 transition-transform" />
+            <span>+91 7223861653</span>
+          </a>
         </div>
       </aside>
 
@@ -282,8 +291,24 @@ export default function Layout() {
         </header>
 
         {/* Content Page with animation container */}
-        <main className="p-3 sm:p-5 md:p-8 max-w-[1440px] w-full mx-auto animate-fade-in flex-1 pb-24 lg:pb-8">
+        <main className="p-3 sm:p-5 md:p-8 max-w-[1440px] w-full mx-auto animate-fade-in flex-1 pb-24 lg:pb-8 flex flex-col justify-between">
           <Outlet />
+
+          {/* Footer Branding */}
+          <footer className="mt-8 pt-4 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+            <span>
+              Developed by <strong className="text-slate-700 font-bold">Ameroids Tech Studio</strong>
+            </span>
+            <a
+              href="https://wa.me/917223861653"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
+            >
+              <MessageCircle size={14} />
+              <span>WhatsApp: +91 7223861653</span>
+            </a>
+          </footer>
         </main>
 
         {/* Mobile Bottom Navigation Bar */}
