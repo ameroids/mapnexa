@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Download, Upload, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock } from 'lucide-react';
+import { Download, Upload, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock, Trash2 } from 'lucide-react';
 import { useSettings } from '../database/useData.js';
 import { useAuth, ALL_PERMISSIONS } from '../context/AuthContext.jsx';
 import { saveSettings } from '../database/repositories.js';
