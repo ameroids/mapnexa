@@ -6,6 +6,7 @@ import { saveCompany, saveVisit } from '../database/repositories.js';
 import { Head, Field, Modal, Confirm, Loading, useToast } from '../components/ui.jsx';
 import { INDUSTRIES, uniq } from './Companies.jsx';
 import { SAMPLE_PRODUCTS } from '../constants/products.js';
+import { CATEGORIES } from '../constants/categories.js';
 import { today } from '../utils/dates.js';
 import { isMapsUrl, viewUrl } from '../utils/googleMaps.js';
 import { parseMapsLink, isShortLink, nearestCity, stateOf, CITY_NAMES } from '../utils/geo.js';
@@ -63,7 +64,7 @@ const blank = (vt) => ({
   note: '',
 
   // General & Geo fields
-  industry: '',
+  industry: 'Paver block manufacturer',
   contactPerson: '',
   designation: '',
   phone: '',
@@ -82,6 +83,7 @@ const blank = (vt) => ({
   productsText: '',
   visitDate: today(),
   visitType: vt,
+  category: 'Paver block manufacturer',
   purpose: '',
   discussedText: '',
   businessOpportunities: '',
@@ -141,11 +143,21 @@ export default function VisitForm({ mode }) {
       base[k] = company[k] ?? base[k];
     });
     base.productsText = (company.products || []).join(', ');
-    if (visit)
+    if (visit) {
+      let visitCat = visit.category;
+      if (!visitCat && visit.purpose) {
+        const m = String(visit.purpose).match(/^\[(.*?)\]/);
+        if (m) visitCat = m[1];
+      }
       Object.assign(base, {
         ...visit,
+        category: visitCat || company?.industry || 'Paver block manufacturer',
         discussedText: (visit.productsDiscussed || []).join(', '),
       });
+    } else if (company) {
+      base.category = company.category || company.industry || 'Paver block manufacturer';
+      base.industry = company.industry || 'Paver block manufacturer';
+    }
     setF(base);
     if (base.latitude !== '' && base.longitude !== '') {
       setCombinedCoords(`${base.latitude}, ${base.longitude}`);
@@ -306,6 +318,7 @@ export default function VisitForm({ mode }) {
           companyId: co.id,
           visitDate: f.visitDate,
           visitType: f.visitType,
+          category: f.category || f.industry || 'Paver block manufacturer',
           whichProductUsing: f.whichProductUsing || '',
           suggestedProduct: f.suggestedProduct || '',
           samplesGiven: f.samplesGiven || [],
@@ -517,6 +530,24 @@ export default function VisitForm({ mode }) {
                     <option key={c} value={c} />
                   ))}
                 </datalist>
+              </Field>
+
+              <Field label="Industry / Category" req>
+                <select
+                  className="input bg-slate-50 focus:bg-white font-semibold text-slate-800"
+                  value={f.industry || 'Paver block manufacturer'}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setF({ ...f, industry: val, category: val });
+                    setDirty(true);
+                  }}
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c.key} value={c.key}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
 
               <Field label="Owner Name" req error={err.ownerName}>

@@ -108,8 +108,13 @@ export async function deleteCompany(id) {
 
 // ----------------- VISITS -----------------
 export async function saveVisit(data) {
+  const category = data.category || '';
+  const purpose = data.purpose || (category ? `[${category}]` : '');
+
   const rec = {
     ...data,
+    category,
+    purpose,
     id: data.id || uid(),
     updatedAt: now(),
     createdAt: data.createdAt || now(),
@@ -182,7 +187,14 @@ export async function syncFromSupabase() {
     }
 
     if (!vRes.error && Array.isArray(vRes.data)) {
-      const serverVisits = vRes.data;
+      const serverVisits = vRes.data.map((v) => {
+        let cat = v.category || '';
+        if (!cat && v.purpose) {
+          const m = String(v.purpose).match(/^\[(.*?)\]/);
+          if (m) cat = m[1];
+        }
+        return { ...v, category: cat };
+      });
       const localVisits = await db.visits.toArray();
       const serverIds = new Set(serverVisits.map((v) => v.id));
 

@@ -7,6 +7,7 @@ import { deleteVisit } from '../database/repositories.js';
 import { Head, Empty, Loading, MapActions, Confirm, Pager, paginate, useToast } from '../components/ui.jsx';
 import { fmt } from '../utils/dates.js';
 import { uniq } from './Companies.jsx';
+import { CATEGORIES, getCategoryMeta } from '../constants/categories.js';
 
 const F0 = { co: '', city: '', state: '', type: '', from: '', to: '' };
 
@@ -239,12 +240,24 @@ export default function Visits() {
                         >
                           {c.companyName}
                         </Link>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                        <div className="flex items-center gap-2 text-xs text-slate-500 mt-1 flex-wrap">
                           <span className="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
                             {fmt(v.visitDate)}
                           </span>
                           <span>•</span>
                           <span className="font-medium">{v.visitType}</span>
+                          {(() => {
+                            const cat = v.category || (v.purpose && v.purpose.match(/^\[(.*?)\]/)?.[1]);
+                            const meta = getCategoryMeta(cat);
+                            return meta ? (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${meta.bg} ${meta.text} ${meta.border}`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                                <span>{meta.label}</span>
+                              </span>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -344,6 +357,7 @@ export default function Visits() {
                       {[
                         'Visit Date',
                         'Company Name',
+                        'Category',
                         'Product Using',
                         'Suggested Product',
                         'Samples Given',
@@ -374,6 +388,22 @@ export default function Visits() {
                               {c.companyName}
                             </Link>
                             <div className="text-[11px] text-slate-400 font-normal">{c.city}</div>
+                          </td>
+                          <td className="td whitespace-nowrap">
+                            {(() => {
+                              const cat = v.category || (v.purpose && v.purpose.match(/^\[(.*?)\]/)?.[1]);
+                              const meta = getCategoryMeta(cat);
+                              return meta ? (
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${meta.bg} ${meta.text} ${meta.border}`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                                  <span>{meta.label}</span>
+                                </span>
+                              ) : (
+                                <span className="text-slate-300">—</span>
+                              );
+                            })()}
                           </td>
                           <td className="td text-xs text-slate-700 font-medium">
                             {v.whichProductUsing || <span className="text-slate-300">—</span>}

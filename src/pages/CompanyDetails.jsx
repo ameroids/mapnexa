@@ -24,6 +24,7 @@ import { deleteCompany, deleteVisit } from '../database/repositories.js';
 import { Head, Empty, Loading, Confirm, useToast } from '../components/ui.jsx';
 import { fmt } from '../utils/dates.js';
 import { viewUrl, dirUrl, openUrl, copyText, addressText, embedUrl } from '../utils/googleMaps.js';
+import { getCategoryMeta } from '../constants/categories.js';
 
 const Row = ({ label, value, mono }) => (
   <div className="py-2.5 border-b border-slate-100 last:border-0 grid grid-cols-3 gap-2 text-sm items-baseline">
@@ -72,6 +73,17 @@ export default function CompanyDetails() {
         title={c.companyName}
         sub={`${c.industry || 'General Industry'} · ${c.city}, ${c.state}`}
       >
+        {c.category && (() => {
+          const meta = getCategoryMeta(c.category);
+          return meta ? (
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${meta.bg} ${meta.text} ${meta.border} shadow-xs mr-2`}
+            >
+              <span className={`w-2 h-2 rounded-full ${meta.dot}`} />
+              <span>{meta.label}</span>
+            </span>
+          ) : null;
+        })()}
         {hasPermission('canEditCompany') && (
           <Link to={`/company/${c.id}/edit`} className="btn">
             <Pencil size={15} />

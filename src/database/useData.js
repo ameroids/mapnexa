@@ -14,7 +14,15 @@ export function useData() {
     if (!companies || !visits) return { loading: true, companies: [], visits: [], rows: [], byId: {} };
     const rows = companies.map((c) => {
       const vs = visits.filter((v) => v.companyId === c.id).sort((a, b) => b.visitDate.localeCompare(a.visitDate));
-      return { ...c, vs, lastVisit: vs[0]?.visitDate || '', firstVisit: vs[vs.length - 1]?.visitDate || '', visitCount: vs.length };
+      const latestCategory = vs[0]?.category || vs.find((v) => v.category)?.category || c.industry || '';
+      return {
+        ...c,
+        vs,
+        lastVisit: vs[0]?.visitDate || '',
+        firstVisit: vs[vs.length - 1]?.visitDate || '',
+        visitCount: vs.length,
+        category: latestCategory,
+      };
     });
     const byId = Object.fromEntries(rows.map((r) => [r.id, r]));
     return { loading: false, companies, visits, rows, byId };

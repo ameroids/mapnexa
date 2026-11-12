@@ -24,20 +24,13 @@ import { Head, Badge, Empty, Loading, MapActions, Confirm, Pager, paginate, useT
 import { fmt } from '../utils/dates.js';
 
 export const INDUSTRIES = [
-  'Manufacturing',
-  'Engineering',
-  'Automobile',
-  'Electrical and Electronics',
-  'Textiles and Garments',
-  'Food Processing',
-  'Chemicals',
-  'Packaging',
-  'Pharmaceuticals',
-  'Construction Materials',
-  'Furniture and Woodworking',
-  'Plastic and Rubber',
-  'Metal Fabrication',
-  'Other',
+  'Paver block manufacturer',
+  'Fly ash bricks manufacturer',
+  'Waterproofing applicator',
+  'Water proofing chemicals trader',
+  'Tiles applicator',
+  'Paint manufacturer',
+  'Builder',
 ];
 export const uniq = (a) => [...new Set(a.filter(Boolean))].sort();
 const F0 = { industry: '', state: '', city: '', from: '', to: '' };
