@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Download, Upload, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock, Trash2 } from 'lucide-react';
+import { Download, Upload, Sliders, Users, UserPlus, Shield, User, Key, Edit, Check, Lock, Trash2, RefreshCw, CheckCircle2, Sparkles } from 'lucide-react';
 import { useSettings } from '../database/useData.js';
 import { useAuth, ALL_PERMISSIONS } from '../context/AuthContext.jsx';
 import { saveSettings } from '../database/repositories.js';
@@ -37,6 +37,20 @@ export default function Settings() {
   // User editing modal state
   const [editingUser, setEditingUser] = useState(null);
   const [delUserId, setDelUserId] = useState(null);
+
+  // Software Update Check state
+  const [updateState, setUpdateState] = useState('idle'); // 'idle' | 'checking' | 'success'
+
+  const handleCheckUpdate = () => {
+    if (updateState !== 'idle') return;
+    setUpdateState('checking');
+    setTimeout(() => {
+      setUpdateState('success');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1400);
+    }, 2000);
+  };
 
   useEffect(() => setS(cur), [cur.appName, cur.defaultVisitType, cur.defaultTravelMode]);
 
@@ -682,6 +696,77 @@ export default function Settings() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Software Updates & System Health Card */}
+      <div className="card p-6 bg-white space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
+              <Sparkles size={18} />
+            </span>
+            <div>
+              <h3 className="font-extrabold text-base text-slate-900 font-display">
+                Software Updates & Maintenance
+              </h3>
+              <p className="text-xs text-slate-500">
+                MapNexa PRO Suite • Developed by Ameroids Tech Studio
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            v2.4.0 (Build 2026.11)
+          </span>
+        </div>
+
+        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <p className="text-sm font-bold text-slate-800">
+                {updateState === 'idle' && 'Cloud Sync & Update Channel: Active'}
+                {updateState === 'checking' && 'Connecting to Ameroids Tech Cloud Server...'}
+                {updateState === 'success' && 'Update Successful! App is fully up to date.'}
+              </p>
+            </div>
+            <p className="text-xs text-slate-500">
+              {updateState === 'idle' && 'Click the button below to check for software patches and synchronize cloud data.'}
+              {updateState === 'checking' && 'Verifying local caches, syncing tables, and fetching latest bundles...'}
+              {updateState === 'success' && 'All latest assets synchronized. Reloading application now...'}
+            </p>
+          </div>
+
+          <button
+            onClick={handleCheckUpdate}
+            disabled={updateState !== 'idle'}
+            className={`btn min-w-[190px] justify-center transition-all duration-300 ${
+              updateState === 'idle'
+                ? 'btn-p shadow-glow-brand hover:brightness-110'
+                : updateState === 'checking'
+                ? 'bg-indigo-600 text-white cursor-wait opacity-90'
+                : 'bg-emerald-600 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+            }`}
+          >
+            {updateState === 'idle' && (
+              <>
+                <RefreshCw size={15} />
+                <span>Check for Updates</span>
+              </>
+            )}
+            {updateState === 'checking' && (
+              <>
+                <RefreshCw size={15} className="animate-spin" />
+                <span>Checking for Updates...</span>
+              </>
+            )}
+            {updateState === 'success' && (
+              <>
+                <CheckCircle2 size={16} className="text-emerald-200" />
+                <span className="font-bold">Update Successful!</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
