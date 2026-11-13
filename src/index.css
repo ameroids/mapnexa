@@ -144,6 +144,21 @@
   text-decoration: underline;
 }
 
+/* Mobile Safe Area & Navigation Utilities (Android gesture bar, 3-button bar & iOS safe-areas) */
+.mobile-nav-bar {
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(8px, env(safe-area-inset-left, 0px));
+  padding-right: max(8px, env(safe-area-inset-right, 0px));
+}
+
+.mobile-content-pb {
+  padding-bottom: calc(88px + max(16px, env(safe-area-inset-bottom, 0px)));
+}
+
+.mobile-toast-pos {
+  bottom: calc(76px + max(12px, env(safe-area-inset-bottom, 0px)));
+}
+
 @keyframes progress {
   0% {
     width: 0%;

@@ -291,7 +291,7 @@ export default function Layout() {
         </header>
 
         {/* Content Page with animation container */}
-        <main className="p-3 sm:p-5 md:p-8 max-w-[1440px] w-full mx-auto animate-fade-in flex-1 pb-24 lg:pb-8 flex flex-col justify-between">
+        <main className="p-3 sm:p-5 md:p-8 max-w-[1440px] w-full mx-auto animate-fade-in flex-1 mobile-content-pb lg:pb-8 flex flex-col justify-between">
           <Outlet />
 
           {/* Footer Branding */}
@@ -314,23 +314,23 @@ export default function Layout() {
         {/* Mobile Bottom Navigation Bar */}
         <nav
           aria-label="Mobile Bottom Navigation"
-          className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5 flex items-center justify-around safe-area-pb"
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-3 pt-2 mobile-nav-bar flex items-center justify-around select-none"
         >
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all ${
+              `flex-1 max-w-[72px] flex flex-col items-center justify-center py-1 px-1.5 rounded-xl text-[10px] font-bold transition-all active:scale-95 touch-manipulation ${
                 isActive ? 'text-indigo-600 font-extrabold' : 'text-slate-500 hover:text-slate-800'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className={`p-1 rounded-lg ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
-                  <LayoutDashboard size={19} />
+                <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
+                  <LayoutDashboard size={20} />
                 </div>
-                <span className="mt-0.5">Home</span>
+                <span className="mt-0.5 tracking-tight">Home</span>
               </>
             )}
           </NavLink>
@@ -338,50 +338,52 @@ export default function Layout() {
           <NavLink
             to="/companies"
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all ${
+              `flex-1 max-w-[72px] flex flex-col items-center justify-center py-1 px-1.5 rounded-xl text-[10px] font-bold transition-all active:scale-95 touch-manipulation ${
                 isActive ? 'text-indigo-600 font-extrabold' : 'text-slate-500 hover:text-slate-800'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className={`p-1 rounded-lg ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
-                  <Building2 size={19} />
+                <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
+                  <Building2 size={20} />
                 </div>
-                <span className="mt-0.5">Companies</span>
+                <span className="mt-0.5 tracking-tight">Companies</span>
               </>
             )}
           </NavLink>
 
           {/* Quick Floating Add Button */}
           {hasPermission('canAddVisit') && (
-            <Link
-              to="/visit/new"
-              aria-label="New Visit or Company"
-              className="flex flex-col items-center justify-center -mt-5 group"
-            >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 group-active:scale-95 transition-all ring-4 ring-white">
-                <Plus size={22} className="stroke-[2.5]" />
-              </div>
-              <span className="text-[10px] font-bold text-slate-700 mt-1">Add Visit</span>
-            </Link>
+            <div className="flex-1 max-w-[72px] flex flex-col items-center justify-center">
+              <Link
+                to="/visit/new"
+                aria-label="New Visit or Company"
+                className="flex flex-col items-center justify-center -mt-6 group touch-manipulation"
+              >
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-[0_8px_20px_rgba(79,70,229,0.4)] group-active:scale-90 transition-all ring-4 ring-white">
+                  <Plus size={24} className="stroke-[2.5]" />
+                </div>
+                <span className="text-[10px] font-extrabold text-slate-700 mt-1 tracking-tight">Add Visit</span>
+              </Link>
+            </div>
           )}
 
           {hasPermission('canViewMap') && (
             <NavLink
               to="/map"
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all ${
+                `flex-1 max-w-[72px] flex flex-col items-center justify-center py-1 px-1.5 rounded-xl text-[10px] font-bold transition-all active:scale-95 touch-manipulation ${
                   isActive ? 'text-indigo-600 font-extrabold' : 'text-slate-500 hover:text-slate-800'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <div className={`p-1 rounded-lg ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
-                    <MapPinned size={19} />
+                  <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
+                    <MapPinned size={20} />
                   </div>
-                  <span className="mt-0.5">Map</span>
+                  <span className="mt-0.5 tracking-tight">Map</span>
                 </>
               )}
             </NavLink>
@@ -391,17 +393,17 @@ export default function Layout() {
             <NavLink
               to="/visits"
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all ${
+                `flex-1 max-w-[72px] flex flex-col items-center justify-center py-1 px-1.5 rounded-xl text-[10px] font-bold transition-all active:scale-95 touch-manipulation ${
                   isActive ? 'text-indigo-600 font-extrabold' : 'text-slate-500 hover:text-slate-800'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <div className={`p-1 rounded-lg ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
-                    <ClipboardList size={19} />
+                  <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : ''}`}>
+                    <ClipboardList size={20} />
                   </div>
-                  <span className="mt-0.5">Visits</span>
+                  <span className="mt-0.5 tracking-tight">Visits</span>
                 </>
               )}
             </NavLink>

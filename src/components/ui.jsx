@@ -29,7 +29,7 @@ export function ToastProvider({ children }) {
   return (
     <T.Provider value={push}>
       {children}
-      <div className="fixed bottom-5 right-5 z-[70] space-y-2 pointer-events-none" aria-live="polite">
+      <div className="fixed mobile-toast-pos lg:bottom-5 right-4 sm:right-5 z-[70] space-y-2 pointer-events-none" aria-live="polite">
         {l.map((t) => (
           <div
             key={t.id}
